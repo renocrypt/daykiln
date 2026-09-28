@@ -27,15 +27,15 @@ The door links to these rooms:
 | 一, KILN | `/yaobian/kiln/` |
 | 二, RULE | `/yaobian/rule/` |
 | 三, PLUMB | `/yaobian/plumb/` |
-| I, UNFOLD | `/plates/lab/unfold-lookdev/` |
-| II, WAKE | `/plates/lab/wake-still/` |
-| III, SAME SKY | `/plates/lab/same-sky-room/` |
+| I, UNFOLD | `/plates/unfold/` |
+| II, WAKE | `/plates/wake/` |
+| III, SAME SKY | `/plates/same-sky/` |
 
 ## Search and sharing
 
-Everything a crawler needs is in the static HTML, since most do not run scripts. The door's head is in `index.html`; the `site()` plugin in `vite.config.ts` writes the rooms' heads, in development and in the build: a title, a description naming the work and what it comes from, a canonical URL, Open Graph and Twitter cards with the work's card, and JSON-LD. The door's JSON-LD holds the album as a collection of six works in two series, each based on its source and that source's maker. Lab studies the door does not link to are `noindex`.
+Everything a crawler needs is in the static HTML, since most do not run scripts. The door's head is in `index.html`; the `site()` plugin in `vite.config.ts` writes the rooms' heads, in development and in the build: a title, a description naming the work and what it comes from, a canonical URL, Open Graph and Twitter cards with the work's card and its alt text, and JSON-LD. Each room's body also opens with its name, what it comes from and a link to the album, kept out of sight as text for assistive technology is: the rooms set no title in the experience. The door's JSON-LD holds the album as a collection of six works in two series, each based on its source and that source's maker. Lab studies the door does not link to are `noindex`.
 
-Yaobian routes in the browser, so the build writes a copy of its page for each room (`/yaobian/kiln/index.html` and so on), each with its own head. `robots.txt`, `sitemap.xml` and `llms.txt` are made from `door/works.ts`.
+Each room is made from a page of this repository (`page` in `door/works.ts`): Yaobian's three from its one page, which routes in the browser; each of Plates' from its study in `plates/lab/`. The build writes a copy of that page at the room's address, with its own head; the studies' own addresses, where Plates' rooms were first published, lead to the rooms. `robots.txt`, `sitemap.xml` (with the build's date as each page's last change) and `llms.txt` are made from `door/works.ts`; `404.html` is the album's name and the way to it.
 
 ## Commands
 

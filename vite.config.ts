@@ -10,13 +10,20 @@ const ORIGIN = 'https://daykiln.renocrypt.com';
 const page = (path: string) => resolve(__dirname, path, 'index.html');
 
 /**
- * Yaobian is a single page with its own routes: /yaobian/kiln, /yaobian/rule and /yaobian/plumb.
- * In development they are all its index.html; the build gives each a copy of it with its own head
- * (see site()), and the preview serves those. Without this, Vite's fallback would answer them with
- * the door. The series have no pages of their own: /plates/ and /yaobian/ lead to the door.
+ * Each work's room is published at its own address (door/works.ts), made from a page of this
+ * repository: Yaobian's three from its one page, which routes in the browser; each of Plates' from
+ * its study. In development the address is answered with that page; the build gives each room a copy
+ * of it with its own head (see site()), and the preview serves those. Without this, Vite's fallback
+ * would answer them with the door. The series have no pages of their own: /plates/ and /yaobian/
+ * lead to the door.
  */
-const ROOM_ROUTE = /^\/yaobian\/(kiln|rule|plumb)\/?(\?.*)?$/;
+const ROOMS = new Map(WORKS.map((w) => [w.path, w.page]));
 const SERIES_ROUTE = /^\/(plates|yaobian)\/?(index\.html)?(\?.*)?$/;
+/** A work's address, if `url` asks for one, with or without its trailing slash. */
+const roomOf = (url = '') => {
+  const path = url.replace(/[?#].*$/, '').replace(/\/?$/, '/');
+  return ROOMS.has(path) ? path : null;
+};
 function rooms(): Plugin {
   const to = (copies: boolean): Connect.NextHandleFunction => (req, res, next) => {
     if (SERIES_ROUTE.test(req.url ?? '')) {
@@ -25,8 +32,8 @@ function rooms(): Plugin {
       res.end();
       return;
     }
-    const room = req.url?.match(ROOM_ROUTE)?.[1];
-    if (room) req.url = copies ? `/yaobian/${room}/index.html` : '/yaobian/index.html';
+    const room = roomOf(req.url);
+    if (room) req.url = copies ? `${room}index.html` : `/${ROOMS.get(room)}/index.html`;
     next();
   };
   return {
@@ -92,7 +99,7 @@ const album = {
   ],
 };
 
-type Head = { title: string; description?: string; image?: string; data?: object };
+type Head = { title: string; description?: string; image?: string; imageAlt?: string; data?: object; work?: Work };
 
 /** Each page's head, by its route; a page not named here is a study, kept out of the index. */
 const HEADS = new Map<string, Head>([
@@ -101,15 +108,26 @@ const HEADS = new Map<string, Head>([
     title: `${w.name} · ${w.series} ${w.numeral} · ${SIGN}`,
     description: `${w.description} One of six works in ${SIGN}.`,
     image: `${ORIGIN}/door/cards/${w.id}.jpg`,
+    imageAlt: `${w.name}, ${w.series} ${w.numeral}: ${w.credit[0].toUpperCase()}${w.credit.slice(1)}.`,
     data: { '@context': 'https://schema.org', ...creativeWork(w), isPartOf: { '@id': seriesId(w.series) } },
+    work: w,
   }]),
 ]);
 
-/** A page's route: its folder, or the Yaobian room it was asked for as. */
+/** A page's route: the work's address it was asked for as, or its folder. */
 function routeOf(path: string, asked?: string): string {
-  const room = asked?.match(ROOM_ROUTE)?.[1];
-  return room ? `/yaobian/${room}/` : path.replace(/\?.*$/, '').replace(/index\.html$/, '');
+  return roomOf(asked) ?? path.replace(/\?.*$/, '').replace(/index\.html$/, '');
 }
+
+/**
+ * What a work's room says in its HTML, for crawlers and screen readers: its name, what it comes
+ * from, and the way to the album. The rooms set no title in the experience, so it is kept out of
+ * sight, as text for assistive technology is.
+ */
+const roomText = (w: Work) => `<header style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0">
+<h1>${escape(w.name)} · ${escape(w.series)} ${escape(w.numeral)}</h1>
+<p>${escape(w.description)} One of six works in <a href="/"><span lang="zh-Hant">${MARK}</span> ${NAME}</a>.</p>
+</header>`;
 
 /** Give a page its head. The door's own is in index.html; it is only given its structured data. */
 function headed(html: string, route: string): { html: string; tags: HtmlTagDescriptor[] } {
@@ -127,6 +145,7 @@ function headed(html: string, route: string): { html: string; tags: HtmlTagDescr
   html = html
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escape(head.title)}</title>`)
     .replace(/<meta name="description"[^>]*>\s*/, '');
+  if (head.work) html = html.replace(/<body([^>]*)>/, (b) => `${b}\n${roomText(head.work!)}`);
   return {
     html,
     tags: [
@@ -141,6 +160,7 @@ function headed(html: string, route: string): { html: string; tags: HtmlTagDescr
       meta('property', 'og:image', head.image ?? CARD),
       meta('property', 'og:image:width', '1200'),
       meta('property', 'og:image:height', '630'),
+      ...(head.imageAlt ? [meta('property', 'og:image:alt', head.imageAlt), meta('name', 'twitter:image:alt', head.imageAlt)] : []),
       meta('name', 'twitter:card', 'summary_large_image'),
       ...(head.data ? [ld(head.data)] : []),
     ],
@@ -154,18 +174,44 @@ const render = (html: string, tags: HtmlTagDescriptor[]) => html.replace('</head
 }).join('\n')}\n</head>`);
 
 const urls = ['/', ...WORKS.map((w) => w.path)];
+/** The day the site was built: each build is a publication, so each page's last change is no later. */
+const BUILT = new Date().toISOString().slice(0, 10);
 
-/** What /plates/ and /yaobian/ serve, now the series have no pages: the way to the door. */
-const TO_DOOR = `<!doctype html>
+/** A page that only leads on: what /plates/ and /yaobian/ serve (the door), and the rooms' old addresses. */
+const LEAD = (to: string) => `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>${TITLE}</title>
 <meta name="robots" content="noindex">
-<link rel="canonical" href="${ORIGIN}/">
-<meta http-equiv="refresh" content="0; url=/">
-<script>location.replace('/')</script>
+<link rel="canonical" href="${ORIGIN}${to}">
+<meta http-equiv="refresh" content="0; url=${to}">
+<script>location.replace('${to}' + location.search + location.hash)</script>
 </head>
+</html>
+`;
+const TO_DOOR = LEAD('/');
+
+/** What GitHub Pages answers for an address that is not there: the album's name, and the way to it. */
+const MISSING = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${TITLE}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/door/icon-32.png" sizes="32x32" type="image/png">
+<style>
+  html { background: #e9e3d6; color: #221b14; }
+  @media (prefers-color-scheme: dark) { html { background: #181614; color: #d9d1c2; } }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font: 400 15px/1.5 ui-serif, Georgia, serif; }
+  a { color: inherit; text-decoration: none; letter-spacing: 0.08em; }
+  a span { font-size: 22px; margin-right: 0.4em; }
+</style>
+</head>
+<body>
+<a href="/"><span lang="zh-Hant">${MARK}</span>${NAME}</a>
+</body>
 </html>
 `;
 const TEXTS: Record<string, { type: string; body: () => string }> = {
@@ -173,7 +219,7 @@ const TEXTS: Record<string, { type: string; body: () => string }> = {
   'sitemap.xml': {
     type: 'application/xml',
     body: () => `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${
-      urls.map((u) => `  <url><loc>${ORIGIN}${u}</loc></url>`).join('\n')}\n</urlset>\n`,
+      urls.map((u) => `  <url><loc>${ORIGIN}${u}</loc><lastmod>${BUILT}</lastmod></url>`).join('\n')}\n</urlset>\n`,
   },
   'llms.txt': {
     type: 'text/plain; charset=utf-8',
@@ -193,14 +239,15 @@ const TEXTS: Record<string, { type: string; body: () => string }> = {
 };
 
 function site(): Plugin {
-  let yaobian = ''; // the built Yaobian page before it was given a head: the rooms' copies are made from it
+  const built = new Map<string, string>(); // the rooms' pages as built, before they were given heads: the rooms are copies of them
+  const pages = new Set(WORKS.map((w) => `/${w.page}/index.html`));
   return {
     name: 'daykiln-site',
     enforce: 'post',
     transformIndexHtml: {
       order: 'post',
       handler(html, ctx) {
-        if (ctx.path === '/yaobian/index.html' && !ctx.server) yaobian = html;
+        if (pages.has(ctx.path) && !ctx.server) built.set(ctx.path, html);
         return headed(html, routeOf(ctx.path, ctx.originalUrl));
       },
     },
@@ -213,14 +260,18 @@ function site(): Plugin {
       });
     },
     generateBundle(_options, bundle) {
-      for (const w of WORKS.filter((w) => w.series === 'Yaobian')) {
-        const { html, tags } = headed(yaobian, w.path);
+      for (const w of WORKS) {
+        const { html, tags } = headed(built.get(`/${w.page}/index.html`) ?? '', w.path);
         this.emitFile({ type: 'asset', fileName: `${w.path.slice(1)}index.html`, source: render(html, tags) });
       }
-      // The rooms' copies made, Yaobian's own page and Plates' address lead to the door.
-      const template = bundle['yaobian/index.html'];
-      if (template?.type === 'asset') template.source = TO_DOOR;
+      // The rooms' copies made, Yaobian's own page and Plates' address lead to the door, and a
+      // Plates room's study, where the room was first published, leads to the room.
+      for (const [page, to] of [['yaobian', '/'], ...WORKS.filter((w) => w.page !== 'yaobian').map((w) => [w.page, w.path])]) {
+        const asset = bundle[`${page}/index.html`];
+        if (asset?.type === 'asset') asset.source = LEAD(to);
+      }
       this.emitFile({ type: 'asset', fileName: 'plates/index.html', source: TO_DOOR });
+      this.emitFile({ type: 'asset', fileName: '404.html', source: MISSING });
       for (const [fileName, text] of Object.entries(TEXTS)) this.emitFile({ type: 'asset', fileName, source: text.body() });
     },
   };
