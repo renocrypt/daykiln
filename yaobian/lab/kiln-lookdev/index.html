@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KILN · look development · Yaobian lab</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #a59c90; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+  #panel, #hint {
+    position: fixed; left: 16px; right: 16px;
+    font: 12px/1.6 ui-monospace, 'SF Mono', Menlo, monospace; color: #2b2723;
+  }
+  #panel { bottom: 16px; background: rgb(165 156 144 / 0.88); padding: 12px 14px; border-radius: 6px; }
+  #readout { margin: 0; white-space: pre; overflow-x: auto; }
+  #panel dl { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; margin: 10px 0 0; opacity: 0.8; }
+  #panel dt { font-weight: 600; } #panel dd { margin: 0; }
+  #hint { top: 16px; opacity: 0.75; transition: opacity 0.6s; pointer-events: none; }
+  #hint.gone { opacity: 0; }
+  #crop { position: fixed; border: 1px solid rgb(255 0 170 / 0.9); pointer-events: none; display: none; }
+</style>
+</head>
+<body>
+<div id="panel" hidden>
+  <pre id="readout"></pre>
+  <dl>
+    <dt>drag · scroll</dt><dd>orbit and zoom · R resets to the study's camera</dd>
+    <dt>← → ↑ ↓</dt><dd>move the softbox around and up · [ ] exposure</dd>
+    <dt>V</dt><dd>view: beauty, thickness, fracture graph · K crackle · B bubbles · D depth of field · X the 4× crop's region</dd>
+    <dt>C</dt><dd>capture the four frames to $TMPDIR/yaobian/renders/ · H this panel</dd>
+  </dl>
+</div>
+<div id="hint">firing…</div>
+<div id="crop"></div>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!-- Superseded 2026-09-23, archived 2026-09-24. Depicts the fallback proposals in CONCEPTS.md, not the selected directions. Not maintained; known defects will not be fixed. -->
+<style>
+#concept-directions{--cd-bg:light-dark(#f5f1e9,#171b1c);--cd-ink:light-dark(#282d2b,#ecece3);--cd-sub:light-dark(#686d65,#a5afa9);--cd-line:light-dark(#dcded4,#373e3a);--cd-paper:light-dark(#e5dac5,#6b6355);--cd-dye:light-dark(#a44c35,#db8663);--cd-green:light-dark(#45665b,#91afa1);--cd-water:light-dark(#477c93,#7cbbd2);--cd-sand:light-dark(#b18742,#e0c68e);--cd-metal:light-dark(#e3ddcc,#363b39);--cd-lit:light-dark(#fcfbf5,#999d91);--cd-shade:light-dark(#929988,#424d45);--cd-ground:light-dark(#b9ac8e,#6e6550);font-family:Inter,system-ui,sans-serif;color:var(--cd-ink);background:var(--cd-bg);border-radius:18px;overflow:hidden;isolation:isolate}
+#concept-directions *{box-sizing:border-box}
+#concept-directions .cd-top{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:17px 22px 13px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--cd-sub)}
+#concept-directions .cd-picks{display:flex;gap:4px;flex-wrap:wrap;padding:0 16px 16px;border-bottom:1px solid var(--cd-line)}
+#concept-directions button{font:500 12px Inter,system-ui,sans-serif;color:var(--cd-sub);background:transparent;border:0;border-radius:7px;padding:10px 12px;min-height:40px}
+#concept-directions button[aria-pressed=true]{background:var(--cd-ink);color:var(--cd-bg)}
+#concept-directions .cd-heading{padding:24px 24px 0;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+#concept-directions .cd-title{font-family:Georgia,serif;font-size:clamp(34px,7vw,55px);font-weight:400;line-height:1;margin:0;letter-spacing:-.04em}
+#concept-directions .cd-kicker{font-size:12px;letter-spacing:.01em;color:var(--cd-sub);margin:9px 0 0}
+#concept-directions .cd-index{font:400 12px ui-monospace,monospace;color:var(--cd-sub);padding-top:5px}
+#concept-directions canvas{display:block;width:100%;height:330px}
+#concept-directions .cd-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:0 24px 20px;color:var(--cd-sub);font:400 11px ui-monospace,monospace;letter-spacing:.06em}
+#concept-directions .cd-controls{border-top:1px solid var(--cd-line);padding:16px 24px 18px;display:grid;grid-template-columns:1fr auto;gap:9px 20px;align-items:center}
+#concept-directions .cd-control-label{display:flex;justify-content:space-between;font-size:12px;gap:16px}
+#concept-directions output{font:400 12px ui-monospace,monospace;min-width:40px;text-align:right}
+#concept-directions input[type=range]{accent-color:var(--cd-ink);width:100%;margin:0;min-height:26px}
+#concept-directions .cd-play{grid-column:2;grid-row:1/3;border:1px solid var(--cd-line);min-width:74px}
+#concept-directions .cd-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(max-width:430px){#concept-directions .cd-top{padding:15px 17px;letter-spacing:.07em}#concept-directions .cd-top span:last-child{display:none}#concept-directions .cd-picks{padding:0 10px 12px;gap:0}#concept-directions .cd-picks button{flex:1;padding:10px 6px;font-size:11px;min-height:44px}#concept-directions .cd-heading{padding:21px 18px 0}#concept-directions canvas{height:280px}#concept-directions .cd-controls{padding:14px 18px;gap:9px 12px}#concept-directions .cd-foot{padding:0 18px 18px;letter-spacing:0}}
+</style>
+<div id="concept-directions" aria-label="Interactive visual concept studies">
+  <div class="cd-top"><span>Four directions · Motion studies</span><span>Illustrative concepts</span></div>
+  <div class="cd-picks" aria-label="Concept selection">
+    <button type="button" class="cursor-interaction" data-concept="weave" aria-pressed="true">01 WEAVE</button>
+    <button type="button" class="cursor-interaction" data-concept="resonant" aria-pressed="false">02 RESONANT</button>
+    <button type="button" class="cursor-interaction" data-concept="rain" aria-pressed="false">03 AFTER RAIN</button>
+    <button type="button" class="cursor-interaction" data-concept="trace" aria-pressed="false">04 TRACE</button>
+  </div>
+  <div class="cd-heading"><div><h2 class="cd-title">Weave.</h2><p class="cd-kicker">A rule becomes material.</p></div><span class="cd-index">01 / 04</span></div>
+  <canvas role="img" aria-label="An illustrative woven textile with an adjustable repeating pattern">Concept previews show woven fabric, vibrating sand, an urban rain model, or a replayable agent trace.</canvas>
+  <div class="cd-foot"><span class="cd-flow">RULE → THREAD → MATERIAL</span><span class="cd-type">TEXTILE / COMPUTATION</span></div>
+  <div class="cd-controls">
+    <label class="cd-control-label" for="cd-input"><span class="cd-label">Pattern scale</span><output for="cd-input">8</output></label>
+    <input id="cd-input" type="range" min="3" max="18" value="8" step="1">
+    <button type="button" class="cd-play cursor-interaction" aria-pressed="false" aria-label="Pause motion">Pause</button>
+  </div>
+  <span class="cd-sr" aria-live="polite" id="cd-status">Weave selected.</span>
+</div>
+<script>
+(()=>{
+  const root=document.getElementById('concept-directions');
+  const canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d');
+  const input=root.querySelector('input'),out=root.querySelector('output'),play=root.querySelector('.cd-play');
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const config={
+    weave:{title:'Weave.',line:'A rule becomes material.',flow:'RULE → THREAD → MATERIAL',type:'TEXTILE / COMPUTATION',label:'Pattern scale',min:3,max:18,step:1,value:8,aria:'An illustrative woven textile with an adjustable repeating pattern'},
+    resonant:{title:'Resonant.',line:'The shape of a note.',flow:'EXCITATION → VIBRATION → PATTERN',type:'SOUND / MATTER',label:'Vibration mode',min:1,max:6,step:1,value:3,aria:'An illustrative vibrating plate with sand gathering along nodal patterns'},
+    rain:{title:'After rain.',line:'Follow the water beneath a city.',flow:'RAIN → SURFACE → GROUND',type:'ARCHITECTURE / ECOLOGY',label:'Green surface',min:0,max:100,step:5,value:45,aria:'A fictional city model with rain flowing over surfaces and into permeable ground'},
+    trace:{title:'Trace.',line:'One change. Every consequence.',flow:'READ → CHANGE → VERIFY',type:'AGENTS / EVIDENCE',label:'Replay position',min:0,max:100,step:1,value:66,aria:'An illustrative agent execution trace with editable replay position; no real run data'}
+  };
+  const values=Object.fromEntries(Object.entries(config).map(([k,v])=>[k,v.value]));
+  const style={motion:!reduced.matches,tempo:.7,textile:'Terracotta'};
+  let selected='weave',time=0,last=0,width=640,height=330,visible=true,palette={},particles=[],lastMode=-1;
+  const keys=Object.keys(config);
+  function save(){if(window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{concept:selected},privateContent:{values:{...values},motion:style.motion}}).catch(()=>{});}
+  function restore(s){if(!s)return;const m=s.modelContent||{},p=s.privateContent||{};if(config[m.concept])selected=m.concept;if(p.values)for(const k of keys){const v=Number(p.values[k]);if(Number.isFinite(v))values[k]=Math.max(config[k].min,Math.min(config[k].max,v));}if(typeof p.motion==='boolean')style.motion=p.motion;}
+  restore(window.openai?.widgetState);
+  const probe=document.createElement('span');probe.style.display='none';root.appendChild(probe);
+  function colors(){for(const key of ['bg','ink','sub','line','paper','dye','green','water','sand','metal','lit','shade','ground']){probe.style.color='var(--cd-'+key+')';palette[key]=getComputedStyle(probe).color;}draw();}
+  function sync(){const c=config[selected];root.querySelector('.cd-title').textContent=c.title;root.querySelector('.cd-kicker').textContent=c.line;root.querySelector('.cd-index').textContent='0'+(keys.indexOf(selected)+1)+' / 04';root.querySelector('.cd-flow').textContent=c.flow;root.querySelector('.cd-type').textContent=c.type;root.querySelector('.cd-label').textContent=c.label;canvas.setAttribute('aria-label',c.aria);input.min=c.min;input.max=c.max;input.step=c.step;input.value=values[selected];out.textContent=values[selected]+(['rain','trace'].includes(selected)?'%':'');root.querySelectorAll('[data-concept]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.concept===selected));play.textContent=style.motion?'Pause':'Play';play.setAttribute('aria-pressed',String(!style.motion));play.setAttribute('aria-label',style.motion?'Pause motion':'Play motion');draw();}
+  root.querySelectorAll('[data-concept]').forEach(b=>b.addEventListener('click',()=>{selected=b.dataset.concept;root.querySelector('#cd-status').textContent=config[selected].title+' Selected.';sync();save();}));
+  input.addEventListener('input',()=>{values[selected]=Number(input.value);sync();});input.addEventListener('change',save);
+  play.addEventListener('click',()=>{style.motion=!style.motion;sync();save();});
+  addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState){restore(e.detail.globals.widgetState);sync();}});
+  const hash=n=>{const x=Math.sin(n*91.347+13.87)*43857.32;return x-Math.floor(x);};
+  const lerp=(a,b,p)=>a+(b-a)*p;
+  function line(a,b,color,lw=1,alpha=1){ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();ctx.globalAlpha=1;}
+  function polygon(points,color,alpha=1){ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.fill();ctx.globalAlpha=1;}
+  function dot(x,y,r,color,alpha=1){ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+  function shadow(x,y,rx,ry,alpha=.12){ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);const g=ctx.createRadialGradient(0,0,.1,0,0,1);g.addColorStop(0,palette.ink);g.addColorStop(1,palette.bg);ctx.globalAlpha=alpha;ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,1,0,Math.PI*2);ctx.fill();ctx.restore();}
+  function weave(){
+    const cols=90,rows=76,scale=values.weave,dye=style.textile==='Petrol'?palette.green:palette.dye;
+    shadow(width*.51,height*.81,width*.4,height*.17,.15);
+    const p=(u,v)=>[width*(.5+(u-.5)*.78+Math.sin(v*4+time*.25)*.048),height*(.11+v*.74)+Math.sin(u*5.8+v*4.5+time*.28)*height*.055+(u-.5)*(u-.5)*height*.1];
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      const u=c/cols,v=r/rows,cell=((c+r)%2===0),diamond=Math.abs((c%scale)-scale/2)+Math.abs((r%scale)-scale/2),band=diamond<scale*.52;
+      const color=band?dye:palette.paper,shade=.65+.35*(.5+.5*Math.cos(u*5.8+v*4.5+time*.28));
+      const a=cell?p(u,v):p(u,v-.001),b=cell?p(u,v+1.35/rows):p(u+1.23/cols,v);
+      line(a,b,color,Math.max(1.3,width/cols*.55),shade);
+      if((c+r)%4===0)line(p(u+.002,v+.002),cell?p(u+.002,v+.009):p(u+.008,v+.002),palette.lit,.65,.35);
+    }
+    for(let c=0;c<cols;c++){const u=c/cols;line(p(u,.003),p(u,-.055-hash(c)*.018),palette.paper,.75,.8);line(p(u,1),p(u,1.055+hash(c+99)*.015),palette.paper,.75,.8);}
+  }
+  function seedSand(mode){
+    const pairs=[[1,2],[2,3],[2,5],[3,5],[4,7],[5,8]],[n,m]=pairs[mode-1];particles=[];
+    for(let i=0;i<75000&&particles.length<4200;i++){const x=hash(i*2)*2-1,y=hash(i*2+1)*2-1;const f=Math.cos(n*Math.PI*x/2)*Math.cos(m*Math.PI*y/2)-Math.cos(m*Math.PI*x/2)*Math.cos(n*Math.PI*y/2);if(Math.abs(f)<.047)particles.push([x,y,hash(i+77)]);}
+    lastMode=mode;
+  }
+  function resonant(){
+    const mode=Math.round(values.resonant);if(lastMode!==mode)seedSand(mode);
+    const s=Math.min(width*.31,height*.53),p=(x,y,z=0)=>[width*.5+(x-y)*s*.69,height*.45+(x+y)*s*.35-z];
+    const corners=[p(-1,-1),p(1,-1),p(1,1),p(-1,1)];shadow(width*.5,height*.82,s*1.3,s*.3,.14);
+    const lower=corners.map(([x,y])=>[x,y+6]);polygon([corners[1],corners[2],lower[2],lower[1]],palette.shade);polygon([corners[2],corners[3],lower[3],lower[2]],palette.ground);polygon(corners,palette.metal);
+    for(let i=0;i<18;i++)line(p(-1,-1+i/9),p(1,-1+i/9),palette.lit,.5,.17);
+    for(const [x,y,j] of particles){const jitter=Math.sin(time*2.8+j*6.28)*.003,pt=p(x+jitter,y-jitter,Math.sin(time*1.8+j*6.28)*.8);dot(pt[0],pt[1],.6+j*.65,palette.sand,.5+j*.5);}
+    const center=p(0,0);dot(center[0],center[1],5,palette.shade);dot(center[0],center[1],2.5,palette.sand);
+  }
+  function rain(){
+    const green=values.rain/100,size=Math.min(width*.052,height*.078),origin=[width*.5,height*.44];
+    const p=(x,y,z=0)=>[origin[0]+(x-y)*size,origin[1]+(x+y)*size*.49-z];
+    const a=p(-4,-3),b=p(4,-3),c=p(4,4),d=p(-4,4),depth=height*.16;
+    shadow(width*.5,height*.86,width*.41,height*.13,.15);
+    polygon([b,c,[c[0],c[1]+depth],[b[0],b[1]+depth]],palette.ground);
+    polygon([c,d,[d[0],d[1]+depth],[c[0],c[1]+depth]],palette.paper);
+    for(let i=1;i<5;i++){line([c[0],c[1]+depth*i/5],[d[0],d[1]+depth*i/5],palette.ground,2,.6);line([b[0],b[1]+depth*i/5],[c[0],c[1]+depth*i/5],palette.shade,1,.3);}
+    polygon([a,b,c,d],palette.metal);
+    const cells=[];for(let x=-4;x<4;x++)for(let y=-3;y<4;y++)cells.push([x,y]);cells.sort((a,b)=>(a[0]+a[1])-(b[0]+b[1]));
+    for(const [x,y]of cells){const id=(x+4)*7+y+3,park=hash(id+12)<green,road=x===0||y===0;
+      const top=[p(x+.04,y+.04),p(x+.95,y+.04),p(x+.95,y+.95),p(x+.04,y+.95)];
+      polygon(top,road?palette.shade:park?palette.green:palette.paper,road?.6:1);
+      if(!road&&!park&&hash(id+1)>.18){const h=Math.min((.5+hash(id+9)*1.9)*size,Math.max(8,p(x+.13,y+.15)[1]-18));
+        polygon([p(x+.13,y+.15),p(x+.8,y+.15),p(x+.8,y+.15,h),p(x+.13,y+.15,h)],palette.paper);
+        polygon([p(x+.8,y+.15),p(x+.8,y+.83),p(x+.8,y+.83,h),p(x+.8,y+.15,h)],palette.shade);
+        polygon([p(x+.13,y+.15,h),p(x+.8,y+.15,h),p(x+.8,y+.83,h),p(x+.13,y+.83,h)],palette.lit);
+      }else if(park&&!road){for(let k=0;k<3;k++){const pt=p(x+.2+hash(id+k)*.6,y+.2+hash(id+k+80)*.6,5);dot(pt[0],pt[1],2.5+hash(id+k+55)*3,palette.green);}}
+    }
+    for(let i=0;i<78;i++){const x=-4+hash(i+11)*8,y=-3+hash(i+200)*7,phase=(time*.27+hash(i+57))%1,z=(1-phase)*height*.56;const v=p(x,y,z);line(v,[v[0]-1.5,v[1]+6],palette.water,.8,.15+phase*.45);}
+    for(let i=0;i<24;i++){const phase=(time*.2+hash(i+899))%1;if(hash(i+17)<green){const v=p(-3+hash(i)*6,3.5,0);dot(v[0],v[1]+phase*depth,1.6,palette.water,(1-phase)*.8);}else{const v=p(-3+phase*7,.5);dot(v[0],v[1],1.6,palette.water,.75);}}
+  }
+  function trace(){
+    const progress=values.trace/100,narrow=width<450,cardW=narrow?61:88,cardH=45;
+    const nodes=[['Task',.09,.48,0],['Read',.31,.23,.15],['Search',.31,.73,.2],['Edit',.55,.23,.43],['Evidence',.55,.73,.48],['Test',.78,.48,.68],['Artifact',.91,.78,.91]];
+    const pts=nodes.map(n=>[width*(.08+n[1]*.84),height*(.08+n[2]*.83)]),edges=[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[5,6]];
+    const curve=(a,b)=>{ctx.beginPath();ctx.moveTo(...a);ctx.bezierCurveTo(lerp(a[0],b[0],.5),a[1],lerp(a[0],b[0],.5),b[1],...b);};
+    for(const [i,j]of edges){const a=pts[i],b=pts[j],active=progress>=nodes[i][3];ctx.strokeStyle=active?palette.green:palette.line;ctx.globalAlpha=active?.7:1;ctx.lineWidth=active?1.5:1;curve(a,b);ctx.stroke();ctx.globalAlpha=1;if(active){const t=(time*.18+j*.16)%1,tt=1-t,cx=(a[0]+b[0])/2;dot(tt*tt*tt*a[0]+3*tt*tt*t*cx+3*tt*t*t*cx+t*t*t*b[0],tt*tt*tt*a[1]+3*tt*tt*t*a[1]+3*tt*t*t*b[1]+t*t*t*b[1],2.6,palette.green);}}
+    nodes.forEach((n,i)=>{const [x,y]=pts[i],active=progress>=n[3];ctx.fillStyle=palette.bg;ctx.fillRect(x-cardW/2-2,y-cardH/2-2,cardW+4,cardH+4);ctx.fillStyle=palette.metal;ctx.globalAlpha=active?.65:.3;ctx.beginPath();ctx.roundRect(x-cardW/2,y-cardH/2,cardW,cardH,5);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle=active?palette.ink:palette.sub;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='500 '+(narrow?11:12)+'px system-ui';ctx.fillText(n[0],x,y-6);for(let k=0;k<3;k++)line([x-cardW*.27,y+8+k*3],[x+cardW*(.08+hash(i+k)*.17),y+8+k*3],active?palette.green:palette.line,1,.6);});
+  }
+  function draw(){if(!ctx||!palette.bg)return;ctx.clearRect(0,0,width,height);ctx.fillStyle=palette.bg;ctx.fillRect(0,0,width,height);({weave,resonant,rain,trace})[selected]();}
+  const resize=new ResizeObserver(()=>{const b=canvas.getBoundingClientRect();width=b.width;height=b.height;const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*d);canvas.height=Math.round(height*d);ctx.setTransform(d,0,0,d,0,0);draw();});resize.observe(canvas);
+  const inView=new IntersectionObserver(e=>visible=e[0]?.isIntersecting??true);inView.observe(root);
+  function frame(now){const dt=Math.min(.05,(now-last)/1000||0);last=now;if(style.motion&&visible&&!document.hidden){time+=dt*style.tempo;draw();}requestAnimationFrame(frame);}
+  new MutationObserver(colors).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});matchMedia('(prefers-color-scheme: dark)').addEventListener('change',colors);
+  reduced.addEventListener('change',e=>{if(e.matches){style.motion=false;sync();}});
+  colors();sync();requestAnimationFrame(frame);
+  if(globalThis.Tweak){const tweak=new Tweak({container:root,onChange:sync});tweak.addSelect(style,'textile',{label:'Textile dye',options:['Terracotta','Petrol']});tweak.addSlider(style,'tempo',{label:'Motion tempo',min:.2,max:1.3,step:.1});}
+})();
+</script>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UNFOLD · look development · Plates lab</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f%5B%5D=stardom@400&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/commit-mono/index.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #ecebe7; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+  #panel, #hint {
+    position: fixed; left: 16px; right: 16px;
+    font: 13px/1.6 'Commit Mono', ui-monospace, monospace; color: #1f1d1a;
+  }
+  #panel { bottom: 16px; background: rgb(236 235 231 / 0.86); padding: 12px 14px; border-radius: 6px; }
+  #readout { margin: 0; white-space: pre; overflow-x: auto; }
+  #panel dl { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; margin: 10px 0 0; opacity: 0.75; }
+  #panel dt { font-weight: 600; } #panel dd { margin: 0; }
+  #hint { font: normal 400 clamp(22px, 2.2vw, 34px)/1.15 'Stardom', serif; letter-spacing: 0.01em;
+    top: 20px; opacity: 0.7; transition: opacity 0.6s; pointer-events: none; }
+  #hint.gone { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="panel" hidden>
+  <pre id="readout"></pre>
+  <dl>
+    <dt>drag · scroll</dt><dd>orbit the globe's center and dolly toward it</dd>
+    <dt>click</dt><dd>focus on what the click lands on</dd>
+    <dt>− =</dt><dd>open up or stop down, f/1.4 to f/16</dd>
+    <dt>1 2 3</dt><dd>50, 105, or 200 mm, keeping the framing</dd>
+    <dt>[ ]</dt><dd>peel the gore back or further</dd>
+    <dt>D</dt><dd>depth of field on or off · T tone curve · M Tissot's field in ink or magenta · I Tissot on or off</dd>
+    <dt>R</dt><dd>reset the view, focus, and lens · H this panel</dd>
+  </dl>
+</div>
+<div id="hint">loading Coronelli's gores…</div>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

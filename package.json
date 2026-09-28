@@ -1,0 +1,24 @@
+{
+  "name": "daykiln",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "check": "tsc && vite build",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "animejs": "4.5.0",
+    "three": "0.186.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.6",
+    "@types/three": "0.186.0",
+    "sharp": "0.35.4",
+    "typescript": "5.9.3",
+    "vite": "7.3.6",
+    "webgpu": "0.6.1"
+  }
+}

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>照 · Daykiln</title>
+<meta name="application-name" content="Daykiln">
+<meta name="description" content="照 Daykiln: six works in two series. Yaobian 窯變: KILN, RULE, PLUMB. Plates: UNFOLD, WAKE, SAME SKY. After the Song celadons, the Alhambra, Gaudí, Coronelli’s globe, Marey’s gull and Turrell’s Skyspaces.">
+<link rel="canonical" href="%ORIGIN%/">
+<meta property="og:site_name" content="Daykiln">
+<meta property="og:type" content="website">
+<meta property="og:url" content="%ORIGIN%/">
+<meta property="og:title" content="照 · Daykiln">
+<meta property="og:description" content="Six works in two series. Yaobian 窯變: KILN, RULE, PLUMB. Plates: UNFOLD, WAKE, SAME SKY.">
+<meta property="og:image" content="%ORIGIN%/door/card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The album’s first leaf: KILN in its window, by the kiln’s fire.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#e9e3d6">
+<link rel="icon" href="/door/icon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/door/icon-16.png" sizes="16x16" type="image/png">
+<link rel="icon" href="/door/icon-96.png" sizes="96x96" type="image/png">
+<link rel="apple-touch-icon" href="/door/icon-180.png">
+<script>
+  // The edition is known before the page is painted: the reader's choice, or else the system's.
+  (() => {
+    let e = null;
+    try { e = localStorage.getItem('daykiln:edition'); } catch {}
+    if (e !== 'paper' && e !== 'rubbing') e = matchMedia('(prefers-color-scheme: dark)').matches ? 'rubbing' : 'paper';
+    document.documentElement.dataset.edition = e;
+    document.querySelector('meta[name="theme-color"]').content = e === 'rubbing' ? '#181614' : '#e9e3d6';
+  })();
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/source-serif-4@5.3.0/opsz.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/source-serif-4@5.3.0/opsz-italic.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-tc@5.3.0/300.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-tc@5.3.0/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/commit-mono@5.3.0/index.css">
+<link rel="stylesheet" href="/door/door.css">
+<script type="speculationrules">
+{ "prefetch": [{ "where": { "selector_matches": ".leaf" }, "eagerness": "moderate" }] }
+</script>
+</head>
+<body>
+<script>
+  // The entrance, once a session: before the door is painted, the kiln's wall is put up over it, and
+  // door/entrance.ts draws on it. Not coming back from a work, nor for a reader who asks for less motion.
+  (() => {
+    try {
+      if (sessionStorage.getItem('daykiln:entered') || sessionStorage.getItem('daykiln:return')) return;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || !window.WebGL2RenderingContext) return;
+      sessionStorage.setItem('daykiln:entered', '1');
+    } catch { return; }
+    const veil = document.createElement('div');
+    veil.id = 'entrance';
+    veil.setAttribute('aria-hidden', 'true');
+    veil.append(document.createElement('canvas'));
+    document.body.append(veil);
+    document.querySelector('meta[name="theme-color"]').content = '#1b120d';
+  })();
+</script>
+<main class="door">
+
+  <!-- The running head: the album's name, and which edition of it this is, the plain sheet or its rubbing. -->
+  <div class="ink head">
+    <div class="running">
+      <h1 class="imprint"><span lang="zh-Hant">照</span> <span class="latin">Daykiln</span></h1>
+      <p class="edition" role="group" aria-label="Edition">
+        <button type="button" value="paper" aria-pressed="true"><span lang="zh-Hant">素</span>Paper</button>
+        <button type="button" value="rubbing" aria-pressed="false"><span lang="zh-Hant">拓</span>Rubbing</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- The pictures sit behind the mount. Each is the link to its work. -->
+  <div class="pictures">
+    <a class="leaf" id="kiln" href="/yaobian/kiln/">
+      <img src="/door/leaves/kiln-1080.webp" srcset="/door/leaves/kiln-1080.webp 1080w, /door/leaves/kiln-1440.webp 1440w" sizes="(max-aspect-ratio: 9/10) 70vw, 38vw" width="1080" height="1080" alt="" decoding="async" fetchpriority="high">
+      <span class="name" lang="zh-Hant">一</span><span class="name">, KILN</span>
+    </a>
+    <a class="leaf" id="rule" href="/yaobian/rule/">
+      <img src="/door/leaves/rule-1080.webp" srcset="/door/leaves/rule-1080.webp 1080w, /door/leaves/rule-1440.webp 1440w" sizes="(max-aspect-ratio: 9/10) 70vw, 38vw" width="1080" height="1080" alt="" decoding="async">
+      <span class="name" lang="zh-Hant">二</span><span class="name">, RULE</span>
+    </a>
+    <a class="leaf" id="plumb" href="/yaobian/plumb/">
+      <img src="/door/leaves/plumb-1080.webp" srcset="/door/leaves/plumb-1080.webp 1080w, /door/leaves/plumb-1440.webp 1440w" sizes="(max-aspect-ratio: 9/10) 70vw, 38vw" width="1080" height="1080" alt="" decoding="async">
+      <span class="name" lang="zh-Hant">三</span><span class="name">, PLUMB</span>
+    </a>
+    <a class="leaf" id="unfold" href="/plates/lab/unfold-lookdev/">
+      <img src="/door/leaves/unfold-1280.webp" srcset="/door/leaves/unfold-1280.webp 1280w, /door/leaves/unfold-2160.webp 2160w" sizes="(max-aspect-ratio: 9/10) 88vw, 62vw" width="1280" height="800" alt="" decoding="async">
+      <span class="name">I, UNFOLD</span>
+    </a>
+    <a class="leaf" id="wake" href="/plates/lab/wake-still/">
+      <img src="/door/leaves/wake-1280.webp" srcset="/door/leaves/wake-1280.webp 1280w, /door/leaves/wake-2160.webp 2160w" sizes="(max-aspect-ratio: 9/10) 88vw, 62vw" width="1280" height="800" alt="" decoding="async">
+      <span class="name">II, WAKE</span>
+    </a>
+    <a class="leaf" id="same-sky" href="/plates/lab/same-sky-room/">
+      <img src="/door/leaves/same-sky-1280.webp" srcset="/door/leaves/same-sky-1280.webp 1280w, /door/leaves/same-sky-2160.webp 2160w" sizes="(max-aspect-ratio: 9/10) 88vw, 62vw" width="1280" height="800" alt="" decoding="async">
+      <span class="name">III, SAME SKY</span>
+    </a>
+  </div>
+
+  <!-- The mount: paper, the cut windows, and the one light on them. -->
+  <canvas class="mount" aria-hidden="true"></canvas>
+
+  <!-- What is printed on the mount. -->
+  <div class="ink">
+    <p class="label" data-for="kiln" aria-hidden="true"><span class="n" lang="zh-Hant">一</span><span class="t">KILN</span></p>
+    <p class="label" data-for="rule" aria-hidden="true"><span class="n" lang="zh-Hant">二</span><span class="t">RULE</span></p>
+    <p class="label" data-for="plumb" aria-hidden="true"><span class="n" lang="zh-Hant">三</span><span class="t">PLUMB</span></p>
+    <p class="label" data-for="unfold" aria-hidden="true"><span class="n">I</span><span class="t">UNFOLD</span></p>
+    <p class="label" data-for="wake" aria-hidden="true"><span class="n">II</span><span class="t">WAKE</span></p>
+    <p class="label" data-for="same-sky" aria-hidden="true"><span class="n">III</span><span class="t">SAME SKY</span></p>
+
+    <footer class="colophon">
+      <div class="quotes">
+        <figure class="quote">
+          <blockquote class="zh" lang="zh-Hant">火事將畢，器不可度，探坯窯眼，以驗生熟，則有火<em>照</em>。<cite>蔣祈《陶記》</cite></blockquote>
+          <figcaption>
+            <p>When the firing is nearly done and the ware cannot be judged, a trial is drawn through the kiln’s eye to tell raw from fired. For this there is the fire’s proof.</p>
+            <p class="who">Jiang Qi, <i>Notes on Pottery</i></p>
+          </figcaption>
+        </figure>
+        <figure class="quote">
+          <blockquote class="zh" lang="zh-Hant">陽燧面洼，向日<em>照</em>之，光皆聚向內。離鏡一二寸，光聚為一點，大如麻菽，著物則火發。<cite>沈括《夢溪筆談》</cite></blockquote>
+          <figcaption>
+            <p>The face of a burning mirror is hollow. Turned to the sun, it gathers all the light inward. An inch or two from the mirror the light comes to one point, the size of a sesame seed, and what it touches catches fire.</p>
+            <p class="who">Shen Kuo, <i>Dream Pool Essays</i></p>
+          </figcaption>
+        </figure>
+      </div>
+
+      <ol class="works">
+        <li><span class="n" lang="zh-Hant">一</span><span class="t">KILN</span><span class="w">after the celadons of the Song</span></li>
+        <li><span class="n" lang="zh-Hant">二</span><span class="t">RULE</span><span class="w">the Hall of the Two Sisters, the Alhambra</span></li>
+        <li><span class="n" lang="zh-Hant">三</span><span class="t">PLUMB</span><span class="w">Antoni Gaudí’s hanging model</span></li>
+        <li><span class="n">I</span><span class="t">UNFOLD</span><span class="w">Vincenzo Coronelli’s globe, 1688</span></li>
+        <li><span class="n">II</span><span class="t">WAKE</span><span class="w">Étienne-Jules Marey’s gull, 1887</span></li>
+        <li><span class="n">III</span><span class="t">SAME SKY</span><span class="w">after James Turrell’s Skyspaces</span></li>
+      </ol>
+
+      <p class="set">Set in Source Serif 4, Noto Serif TC and Commit Mono; 照 after Arphic. In progress, 2026.</p>
+    </footer>
+  </div>
+</main>
+
+<!-- Only this is in the flow: the length of the album, for the browser's own scroll. -->
+<div class="length" aria-hidden="true"></div>
+
+<script type="module" src="/door/main.ts"></script>
+</body>
+</html>

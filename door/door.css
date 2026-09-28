@@ -1,0 +1,187 @@
+/*
+ * The door. One album, read from the top down as the character 照 is written: 日 over 灬, daylight
+ * over fire. The mount is a canvas multiplied onto the pictures behind it, so its windows are where
+ * it is light, and the light on the mount is the light on the pictures.
+ */
+
+@view-transition { navigation: auto; }
+
+:root {
+  color-scheme: light;
+  --paper: #e9e3d6; /* the mount under full daylight, before the canvas has drawn it */
+  --ink: #221b14;
+  --serif: 'Source Serif 4 Variable', 'Noto Serif TC', serif;
+  --song: 'Noto Serif TC', 'Source Serif 4 Variable', serif;
+  --mono: 'Commit Mono', ui-monospace, monospace;
+}
+/* The rubbing: the same sheet, inked on everything that stands up. */
+:root[data-edition='rubbing'] {
+  color-scheme: dark;
+  --paper: #181614;
+  --ink: #d9d1c2;
+}
+
+html { background: var(--paper); scrollbar-gutter: stable; }
+body {
+  margin: 0; color: var(--ink);
+  font: 400 17px/1.55 var(--serif); font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+
+/* The mount multiplies onto white: white is where nothing lies behind it. The door is clipped, not
+   hidden, so that a leaf reached by the keyboard cannot scroll it: only the page scrolls. */
+.door { position: fixed; inset: 0; overflow: hidden; overflow: clip; background: #fff; }
+/* Until main.ts has placed the album, none of it is shown: that frame is the bare paper, and nothing moves after it. */
+:root:not(.placed) .door { visibility: hidden; }
+.pictures, .ink { position: absolute; left: 0; top: 0; width: 100%; transform-origin: 0 0; } /* placed on the sheet, and moved by the camera (main.ts) */
+.mount {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; mix-blend-mode: multiply; background: var(--paper);
+}
+.ink { mix-blend-mode: multiply; pointer-events: none; }
+/* In the rubbing the lettering is cut, and so is paper, lit where it lies (main.ts writes --lit). */
+:root[data-edition='rubbing'] .ink { mix-blend-mode: normal; }
+:root[data-edition='rubbing']:not(.flat) .cut {
+  background: var(--lit, var(--ink)); -webkit-background-clip: text; background-clip: text;
+  color: transparent; text-emphasis-color: rgb(217 209 194 / 0.7);
+}
+.lift { position: absolute; inset: 0; pointer-events: none; }
+.pictures { z-index: 0; } .mount { z-index: 1; } .ink { z-index: 2; } .lift { z-index: 3; }
+
+/* The entrance's veil (index.html, entrance.ts): the kiln's wall, until its fire is drawn on it. If
+   the entrance never comes to draw, the veil goes by itself. */
+#entrance { position: fixed; inset: 0; z-index: 10; background: #1b120d; animation: entrance-gone 0.5s ease 7s forwards; }
+#entrance canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+@keyframes entrance-gone { to { opacity: 0; visibility: hidden; } }
+
+/* A picture fills its window exactly, and a device pixel more: that lies under the bevel's foot. */
+.leaf {
+  position: absolute; display: block; overflow: hidden; outline: none;
+  left: calc(var(--x) * 1px - var(--hair, 1px)); top: calc(var(--y) * 1px - var(--hair, 1px));
+  width: calc(var(--w) * 1px + 2 * var(--hair, 1px)); height: calc(var(--h) * 1px + 2 * var(--hair, 1px));
+  -webkit-tap-highlight-color: transparent;
+}
+.leaf.round { border-radius: 50%; }
+.leaf.round.front { z-index: 1; } /* Yaobian's three share the lens: the one behind it answers */
+.leaf img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+/* Until the mount draws the strip behind the lens (and without the mount), the pictures slide past in their circle. */
+.leaf.round img { translate: calc(var(--off, 0) * 115%) 0; }
+.leaf.carried img { visibility: hidden; } /* the mount draws it, behind the lens or on its leaf */
+.pictures.turning .leaf:not(.round) { pointer-events: none; } /* a plate answers only while it lies flat before the eye */
+/* Reached by the keyboard, a leaf is ruled round, as a mount's window is: the mount draws it. */
+html.flat .leaf:focus-visible { outline: 1px solid var(--ink); outline-offset: 13px; }
+.name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The lifted picture, above everything while it leaves for its work or comes back from it. It
+   keeps the light it lay in, multiplied over it, until it is the whole view. */
+.lifted {
+  position: absolute; left: 0; top: 0; transform-origin: 0 0; isolation: isolate;
+  will-change: transform; backface-visibility: hidden;
+}
+.lifted .face { position: absolute; inset: 0; isolation: isolate; }
+.lifted img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.lifted .tint { position: absolute; inset: 0; mix-blend-mode: multiply; }
+
+/* A leaf's label: the numeral, then the name running down the margin, as a title slip does. */
+.label {
+  position: absolute; margin: 0;
+  left: calc(var(--x) * 1px); top: calc(var(--y) * 1px);
+  display: flex; flex-direction: column; align-items: center; gap: 22px;
+}
+.label .n {
+  font: 300 30px/1 var(--serif); font-variation-settings: 'opsz' 60; letter-spacing: 0.02em;
+  opacity: 0;
+}
+.label .n:lang(zh-Hant) { font-family: var(--song); font-weight: 300; }
+.label .t {
+  writing-mode: vertical-rl; font: 400 11px/1 var(--mono); letter-spacing: 0.32em;
+  opacity: 0;
+}
+/* On a tall screen, under the window, from its left edge: numeral, then name. */
+html.portrait .label { flex-direction: row; align-items: baseline; gap: 14px; }
+html.portrait .label .n { font-size: 22px; }
+html.portrait .label .t { writing-mode: horizontal-tb; }
+/* Beside a round window, its label hangs from the window's middle; under it, it is centred. */
+.label.round { transform: translateY(-50%); }
+html.portrait .label.round { transform: translateX(-50%); }
+
+/* The colophon: the two sentences the name comes from, then the works, then the type. */
+.colophon {
+  position: absolute; left: calc(var(--x, 0) * 1px); top: calc(var(--y) * 1px); width: 100%; box-sizing: border-box;
+  padding: 0 max(7vw, 24px); pointer-events: auto;
+  display: flex; flex-direction: column; align-items: center; gap: clamp(72px, 13vh, 150px);
+}
+.quotes { display: flex; flex-direction: column; gap: clamp(72px, 12vh, 132px); }
+.quote { margin: 0; display: flex; flex-direction: row-reverse; align-items: flex-start; gap: clamp(36px, 5vw, 72px); }
+.zh {
+  margin: 0; writing-mode: vertical-rl; inline-size: 13em; flex: none;
+  font: 400 21px/2.05 var(--song); letter-spacing: 0.1em;
+  font-feature-settings: 'vpal' 0;
+}
+.zh em { font-style: normal; text-emphasis: open circle; text-emphasis-position: over right; }
+.zh cite { display: block; font-style: normal; font-size: 14px; letter-spacing: 0.16em; margin-block-start: 5.5em; }
+.quote figcaption { width: min(27ch, 60vw); padding-top: 0.2em; }
+.quote figcaption p { margin: 0; text-wrap: pretty; hanging-punctuation: first; }
+.quote .who { margin-top: 1.1em; font-size: 14px; letter-spacing: 0.01em; opacity: 0.8; }
+
+.works {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: auto auto auto; column-gap: 26px; row-gap: 9px; align-items: baseline;
+}
+.works li { display: contents; }
+.works .n { text-align: right; font: 300 17px/1 var(--serif); font-variation-settings: 'opsz' 24; }
+.works .n:lang(zh-Hant) { font-family: var(--song); font-size: 15px; }
+.works .t { font: 400 11px/1 var(--mono); letter-spacing: 0.28em; }
+.works .w { font-size: 15px; font-style: italic; opacity: 0.85; }
+.works li:nth-child(4) > * { padding-top: 22px; } /* the hinge between the two series */
+
+.set { margin: 0; font: 400 11px/1.6 var(--mono); letter-spacing: 0.1em; opacity: 0.7; text-align: center; }
+
+/* The running head, over the first window: the album's name flush with its left edge, the edition
+   flush with its right, the buttons' padding overhanging it. */
+.running {
+  position: absolute; container: running / inline-size;
+  left: calc(var(--x) * 1px); top: calc(var(--y) * 1px + env(safe-area-inset-top));
+  width: calc(var(--w) * 1px + 12px); transform: translateY(-50%);
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+/* Set as the edition's buttons are: the character, then the name in capitals. */
+.imprint {
+  margin: 0; display: flex; align-items: baseline; gap: 0.7em; white-space: nowrap;
+  font: 400 11px/44px var(--mono); letter-spacing: 0.14em; text-transform: uppercase;
+}
+.imprint span:lang(zh-Hant) { font: 400 14px/1 var(--song); letter-spacing: 0; }
+/* Where the row is too short for both, the name is kept for reading and left unset. */
+@container running (width < 300px) {
+  .imprint .latin { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+.edition { margin: 0; display: flex; gap: 2px; pointer-events: auto; }
+.edition button {
+  appearance: none; border: 0; background: none; color: inherit; cursor: pointer;
+  display: inline-flex; align-items: baseline; gap: 0.7em; min-height: 44px; padding: 0 12px;
+  font: 400 11px/44px var(--mono); letter-spacing: 0.14em; text-transform: uppercase;
+  opacity: 0.45; transition: opacity 0.3s;
+}
+.edition button span { font: 400 14px/1 var(--song); letter-spacing: 0; text-transform: none; }
+.edition button[aria-pressed='true'] { opacity: 1; cursor: default; }
+.edition button:hover { opacity: 0.8; }
+.edition button[aria-pressed='true']:hover { opacity: 1; }
+.edition button:focus-visible { outline: 1px solid currentColor; outline-offset: -8px; }
+:root[data-edition='rubbing'] .edition button:focus-visible { outline-color: var(--ink); }
+
+@media (max-width: 720px) {
+  .quote { flex-direction: column; align-items: flex-end; gap: 28px; }
+  .quote figcaption { width: auto; max-width: 34ch; }
+  .works { column-gap: 14px; }
+  .works .w { font-size: 14px; }
+}
+
+/* Without WebGL2: a plain mount, the same album. */
+html.flat, html.flat .door { background: var(--paper); }
+html.flat .mount { display: none; }
+html.flat .ink { mix-blend-mode: normal; }
+html.flat .leaf img { opacity: 1; box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08); }
+html.flat[data-edition='rubbing'] .leaf img { box-shadow: 0 0 0 1px rgb(255 255 255 / 0.1); }
+html.flat .label:not(.round) .n, html.flat .label:not(.round) .t { opacity: 1; } /* the lens's three share one place: its picture's is printed */
+
+::selection { background: rgb(160 110 40 / 0.22); }

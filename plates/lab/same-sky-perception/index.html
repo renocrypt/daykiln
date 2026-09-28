@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SAME SKY · perception test · Plates lab</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f%5B%5D=tabular@1&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/commit-mono/index.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: manipulation; }
+  #panel, #hint {
+    position: fixed; left: 16px; right: 16px;
+    font: 13px/1.6 'Commit Mono', ui-monospace, monospace; color: #e8e6e1;
+  }
+  #panel { bottom: 16px; background: rgb(0 0 0 / 0.72); padding: 12px 14px; border-radius: 6px; }
+  #readout { margin: 0 0 10px; white-space: pre; overflow-x: auto; }
+  #panel button {
+    font: inherit; color: inherit; background: rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.18); border-radius: 4px; padding: 6px 9px; margin: 0 4px 6px 0;
+  }
+  #panel dl { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; margin: 6px 0 0; opacity: 0.7; }
+  #panel dt { font-weight: 600; } #panel dd { margin: 0; }
+  #hint { font: normal 300 clamp(22px, 2.2vw, 34px)/1.15 'Tabular', sans-serif; letter-spacing: 0.3em;
+    top: 20px; opacity: 0.8; transition: opacity 0.6s; pointer-events: none; text-shadow: 0 0 6px rgb(0 0 0 / 0.5); }
+  #hint.gone { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="panel" hidden>
+  <pre id="readout"></pre>
+  <div>
+    <button data-action="toggle">A / B</button><button data-action="nextA">next A</button><button data-action="nextB">next B</button>
+    <button data-action="dimmer">dimmer</button><button data-action="brighter">brighter</button><button data-action="sky">sky</button>
+    <button data-action="smaller">smaller</button><button data-action="larger">larger</button><button data-action="gradient">gradient</button>
+    <button data-action="probe">probe</button><button data-action="fullscreen">fullscreen</button>
+  </div>
+  <div>
+    <button data-action="rate0">shift 0</button><button data-action="rate1">1</button><button data-action="rate2">2</button><button data-action="rate3">3</button>
+    <button data-action="export">export log</button><button data-action="clear">clear log</button><button data-action="panel">hide</button>
+  </div>
+  <dl>
+    <dt>1–6</dt><dd>wash A: neutral, amber, rose, violet, green, dark · B cycles wash B</dd>
+    <dt>space · click</dt><dd>switch between A and B, easing as the piece would · X switches instantly</dd>
+    <dt>↑ ↓</dt><dd>wash intensity in quarter stops · S sky · [ ] aperture size · G gradient</dd>
+    <dt>P</dt><dd>probe the displayed sky pixels · F fullscreen · H this panel</dd>
+    <dt>shift + 0–3</dt><dd>record the perceived sky shift for the current A/B pair · E export the log</dd>
+  </dl>
+</div>
+<div id="hint">H: controls</div>
+<script type="module">
+  setTimeout(() => document.querySelector('#hint').classList.add('gone'), 3000);
+</script>
+<script type="module" src="./main.ts"></script>
+</body>
+</html>

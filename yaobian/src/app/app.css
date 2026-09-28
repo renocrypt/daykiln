@@ -1,0 +1,194 @@
+/* The series' page: a ground the piece sets, one monospace for every label (LOOK.md). */
+
+@font-face {
+  font-family: 'Martian Mono';
+  src: url('/yaobian/fonts/martian-mono/MartianMono-NrRg.woff2') format('woff2');
+  font-stretch: 75%;
+  font-display: swap;
+}
+/* Each piece's title in its own hand, over the one label face: RULE's in engraved roman capitals, as
+   the plates Owen Jones and Jules Goury published of the Alhambra were lettered; PLUMB's in the
+   technical lettering of engineering drawings, ISO 3098. KILN's is the label face, set large. */
+@font-face {
+  font-family: 'Junicode Titles';
+  src: url('/yaobian/fonts/junicode/Junicode-Titles.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'osifont';
+  src: url('/yaobian/fonts/osifont/osifont-lgpl3fe-titles.woff2') format('woff2');
+  font-display: swap;
+}
+
+:root {
+  --ink: #2b2723;
+  --paper: #f1ece2;
+  --seal: #b3322a;
+  --label: 12px/1.6 'Martian Mono', ui-monospace, monospace;
+}
+
+html, body { margin: 0; height: 100%; }
+body { background: var(--paper); color: var(--ink); font: var(--label); letter-spacing: 0.01em; }
+#stage { position: fixed; inset: 0; overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+/* A touch screen has no keys to name. */
+.record kbd { font: inherit; margin-left: 6px; opacity: 0.7; }
+@media (hover: none) { .guide kbd, .record kbd { display: none; } }
+
+/* The kept result */
+.record { position: absolute; inset: 0; z-index: 2; display: grid; grid-template-rows: 1fr auto; justify-items: center; align-items: center; gap: 12px; padding: 24px; background: rgb(43 39 35 / 0.72); opacity: 0; transition: opacity 0.5s; }
+.record.on { opacity: 1; }
+/* The sheet, A3, as large as the screen allows in both directions. */
+.record .sheet { width: min(calc(100vw - 48px), calc((100vh - 110px) * 297 / 420)); aspect-ratio: 297 / 420; box-shadow: 0 10px 40px rgb(0 0 0 / 0.35); }
+.record .sheet svg { width: 100%; height: 100%; display: block; }
+.record .actions { margin: 0; display: flex; gap: 32px; color: #f1ece2; }
+
+/* A piece's guide: the prologue, the steps, what to do, the log, the actions. Words sit on the
+   scene, not in boxes; a scrim under them where the scene is busy. */
+.guide { position: absolute; inset: 0; pointer-events: none; color: var(--paper); text-shadow: 0 1px 12px rgb(20 16 12 / 0.55); }
+.guide > * { pointer-events: auto; }
+.guide .poster { position: absolute; inset: 0; background: center / cover no-repeat; pointer-events: none; filter: brightness(0.7); }
+.guide .back { position: absolute; top: 22px; left: 28px; z-index: 3; opacity: 0.75; letter-spacing: 0.04em; transition: opacity 0.3s; }
+.guide .back:hover { opacity: 1; }
+.guide .back span { display: inline-block; margin-right: 6px; transition: transform 0.3s; }
+.guide .back:hover span { transform: translateX(-3px); }
+/* The sound's mark, mirroring the way back: one hairline that swells with the sound being made. */
+.guide .sound { position: absolute; top: 17px; right: 24px; z-index: 3; display: inline-flex; align-items: center; gap: 8px; padding: 2px 4px; opacity: 0.6; letter-spacing: 0.04em; transition: opacity 0.3s; }
+.guide .sound::before { content: ''; position: absolute; inset: -12px -8px; } /* a finger's reach */
+.guide .sound:hover { opacity: 0.9; }
+.guide .sound svg { overflow: visible; }
+.guide .sound path { fill: none; stroke: currentColor; stroke-width: 1; vector-effect: non-scaling-stroke; opacity: calc(0.5 + 0.5 * var(--swell, 1)); }
+.guide .sound.off { opacity: 0.4; }
+.guide .sound.off path { opacity: 0.5; }
+.guide .sound kbd { margin-left: 4px; }
+
+.guide .prologue { position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none; }
+.guide .prologue::-webkit-scrollbar { display: none; }
+.guide .prologue::before { content: ''; position: fixed; inset: 0; pointer-events: none;
+  background: linear-gradient(to right, rgb(20 16 12 / 0.5), rgb(20 16 12 / 0.14) 42%, transparent 62%),
+              linear-gradient(to top, rgb(20 16 12 / 0.45), transparent 26%); }
+.guide section { position: relative; min-height: 100vh; box-sizing: border-box; padding: 0 7vw; display: grid; align-content: center; }
+.guide .hero { align-content: end; padding-bottom: 9vh; }
+.guide .hero h1 { margin: 0; font: 400 clamp(72px, 15vw, 220px)/0.9 'Martian Mono', ui-monospace, monospace; letter-spacing: 0.02em; }
+.guide .hero h1 .char, .guide .hero h1 > span { display: inline-block; }
+/* Each name placed as its scene allows. KILN: small, centred under the bowl, tracked wide, a label on
+   the table. RULE: centred under the dome, spaced roman capitals on a hairline rule. PLUMB: large at
+   the lower left, the net's counterweight, a drawing's title. */
+.guide.kiln .hero, .guide.rule .hero { justify-items: center; text-align: center; }
+.guide.kiln .hero h1 { font-size: clamp(44px, 6.4vw, 96px); letter-spacing: 0.34em; margin-right: -0.34em; }
+.guide.kiln .hero { padding-bottom: 8vh; }
+.guide.rule .hero h1 { font-family: 'Junicode Titles', serif; font-weight: 400; font-size: clamp(56px, 9.5vw, 150px); line-height: 1; letter-spacing: 0.18em; margin-right: -0.18em; }
+.guide.rule .hero .rule-line { display: block; width: min(40rem, 64vw); height: 1px; margin: 6px 0 0; background: currentColor; transform: scaleX(0); transform-origin: center; }
+.guide.rule .hero .maker { margin-top: 16px; }
+.guide.plumb .hero h1 { font-family: 'osifont', sans-serif; font-size: clamp(72px, 14vw, 210px); letter-spacing: 0.04em; }
+.guide.plumb .hero .maker { margin-top: 30px; }
+.guide.kiln .prologue::before, .guide.rule .prologue::before {
+  background: linear-gradient(to right, rgb(20 16 12 / 0.36), rgb(20 16 12 / 0.1) 40%, transparent 60%),
+              linear-gradient(to top, rgb(20 16 12 / 0.55), rgb(20 16 12 / 0.18) 30%, transparent 52%); }
+/* RULE's name sits on the busiest part of its frame: a soft dark field under it alone. */
+.guide.rule .prologue::before {
+  background: radial-gradient(ellipse 42% 26% at 50% 80%, rgb(20 16 12 / 0.55), rgb(20 16 12 / 0.2) 60%, transparent 100%),
+              linear-gradient(to right, rgb(20 16 12 / 0.36), rgb(20 16 12 / 0.1) 40%, transparent 60%),
+              linear-gradient(to top, rgb(20 16 12 / 0.6), rgb(20 16 12 / 0.2) 30%, transparent 52%); }
+.guide .hero .maker { margin: 18px 0 0; font-size: 15px; letter-spacing: 0.08em; opacity: 0.8; }
+.guide .hero .hint { position: absolute; right: 7vw; bottom: 9vh; margin: 0; font-size: 12px; letter-spacing: 0.08em; opacity: 0.7; animation: breathe 2.6s ease-in-out infinite; }
+@keyframes breathe { 50% { opacity: 0.35; } }
+.guide .copy { max-width: 31rem; }
+.guide .copy p { margin: 0 0 1.1em; font-size: 16px; line-height: 1.75; }
+.guide .copy .kicker { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.65; margin-bottom: 1.6em; }
+.guide .way-in { justify-items: start; }
+.guide .preview { list-style: none; margin: 0 0 40px; padding: 0; display: flex; gap: 28px; flex-wrap: wrap; font-size: 13px; letter-spacing: 0.06em; }
+.guide .preview .n, .guide .steps .n { opacity: 0.55; margin-right: 8px; font-size: 11px; }
+.guide .begin { padding: 14px 26px; border: 1px solid rgb(241 236 226 / 0.7); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; transition: background 0.3s, color 0.3s; }
+.guide .begin:not(:disabled):hover { background: var(--paper); color: var(--ink); text-shadow: none; }
+.guide .begin:disabled { opacity: 0.4; cursor: default; }
+.guide kbd { font: inherit; font-size: 10px; margin-left: 12px; padding: 1px 5px; border: 1px solid currentColor; border-radius: 3px; opacity: 0.6; }
+
+.guide .steps { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); list-style: none; margin: 0; padding: 0; display: flex; gap: 34px; font-size: 12px; letter-spacing: 0.08em; visibility: hidden; }
+.guide.begun .steps { visibility: visible; }
+.guide .steps li { position: relative; opacity: 0.35; transition: opacity 0.6s; padding-bottom: 8px; }
+.guide .steps li::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+.guide .steps li.now { opacity: 1; }
+.guide .steps li.now::after { transform: scaleX(1); }
+.guide .steps li.done { opacity: 0.6; }
+
+/* The log, at the lower left over the scrim: out of the middle, where the scene is. */
+.guide .log { position: absolute; left: 28px; bottom: 30px; width: min(20rem, 22vw); list-style: none; margin: 0; padding: 0; font-size: 12.5px; line-height: 1.6; pointer-events: none; }
+.guide .log li { display: grid; grid-template-columns: 4.6rem 1fr; gap: 12px; margin-top: 12px; transition: filter 1.2s; }
+.guide .log li .stamp { opacity: 0.6; font-variant-numeric: tabular-nums; }
+.guide .log li:nth-last-child(n + 3) { filter: opacity(0.45); } /* its opacity is Anime's, for the entrance */
+.guide .log li:nth-last-child(n + 5) { display: none; }
+
+.guide .bottom { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); width: min(44rem, calc(56vw - 104px)); /* clear of the log and the instrument at either side */ display: grid; justify-items: center; gap: 18px; text-align: center; visibility: hidden; }
+.guide.begun .bottom { visibility: visible; }
+.guide.begun::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgb(20 16 12 / 0.66), rgb(20 16 12 / 0.34) 20vh, transparent 40vh),
+              linear-gradient(to bottom, rgb(20 16 12 / 0.4), transparent 14vh); }
+.guide .say { margin: 0; font-size: 15px; line-height: 1.65; min-height: 1.65em; }
+.guide .meter { width: min(30rem, 80vw); }
+.guide .meter .track { height: 2px; background: rgb(241 236 226 / 0.25); }
+.guide .meter .fill { display: block; height: 100%; background: var(--paper); transition: width 0.1s linear; }
+.guide .meter .marks { position: relative; height: 22px; font-size: 11px; letter-spacing: 0.06em; opacity: 0.7; }
+.guide .meter .marks i { position: absolute; top: 0; transform: translateX(-50%); font-style: normal; }
+.guide .meter .marks i::before { content: ''; display: block; width: 1px; height: 6px; margin: -4px auto 3px; background: currentColor; }
+.guide .meter .marks b { font-weight: 400; }
+.guide .meter .value { margin: 6px 0 0; font-size: 12.5px; opacity: 0.9; }
+.guide .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; min-height: 42px; }
+.guide .actions button { padding: 11px 20px; border: 1px solid rgb(241 236 226 / 0.55); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; transition: background 0.3s, color 0.3s, border-color 0.3s; }
+.guide .actions button:hover { border-color: var(--paper); }
+.guide .actions button.primary { background: var(--paper); color: var(--ink); text-shadow: none; border-color: var(--paper); }
+.guide .actions button.primary:hover { background: #fff; }
+.guide .instrument { position: absolute; left: 28px; bottom: 30px; }
+/* A part named on the scene: a 3 px dot on it, a hairline up from it, the name over the dark above. */
+.marks { position: absolute; inset: 0; pointer-events: none; }
+.mark { position: absolute; left: 0; top: 0; margin: 0; font-size: 11.5px; letter-spacing: 0.04em; color: var(--paper); white-space: nowrap; text-shadow: 0 0 3px rgb(20 16 12 / 0.8), 0 1px 12px rgb(20 16 12 / 0.7); }
+.mark i { position: absolute; left: -1.5px; top: -1.5px; width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+.mark::before { content: ''; position: absolute; left: -0.25px; bottom: 2px; width: 0.5px; height: var(--leader, 30px); background: currentColor; opacity: 0.75; }
+.mark span { position: absolute; left: 6px; bottom: calc(var(--leader, 30px) - 4px); }
+.mark.leftward span { left: auto; right: 6px; }
+.marks { transition: opacity 0.3s; }
+.keeping .marks, .leaning .marks { opacity: 0; }
+.knot-tag { position: absolute; left: 0; top: 0; margin: 0; padding: 3px 8px; font-size: 11.5px; color: var(--paper); background: rgb(20 16 12 / 0.6); pointer-events: none; white-space: nowrap; }
+.rule-diagram { margin: 0; width: 176px; }
+.sun-dial { margin: 0; width: 220px; display: grid; gap: 8px; }
+.sun-dial input { width: 100%; accent-color: #f1ece2; }
+.sun-dial figcaption { display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.08em; }
+.sun-dial .deg { opacity: 0.7; }
+.rule-diagram svg { display: block; width: 176px; height: 176px; background: rgb(241 236 226 / 0.92); cursor: grab; touch-action: none; box-shadow: 0 6px 30px rgb(20 16 12 / 0.35); }
+.rule-diagram svg.holding { cursor: grabbing; }
+.rule-diagram .held .edge { stroke: var(--seal); stroke-width: 1.1; }
+.rule-diagram .held .arc { fill: none; stroke: var(--seal); stroke-width: 0.6; }
+.rule-diagram .held .ray { stroke: var(--seal); stroke-width: 1.4; stroke-linecap: round; }
+.rule-diagram .held .hand { fill: var(--seal); stroke: rgb(241 236 226); stroke-width: 0.8; }
+.rule-diagram .tiles polygon { fill: none; stroke: #aaa08f; stroke-width: 0.45; stroke-dasharray: 1.2 1; }
+.rule-diagram .mids circle { fill: var(--seal); }
+.rule-diagram .lines { fill: none; stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; }
+.rule-diagram figcaption { display: grid; gap: 2px; padding: 10px 2px 0; font-size: 11.5px; white-space: nowrap; }
+.rule-diagram figcaption .angle { font-size: 15px; letter-spacing: 0.04em; }
+.rule-diagram figcaption .does { display: block; max-width: 176px; margin: 2px 0 4px; font-size: 11.5px; line-height: 1.45; letter-spacing: 0; white-space: normal; opacity: 0.75; }
+.keeping .guide .bottom, .keeping .guide .steps, .keeping .guide .instrument { opacity: 0; transition: opacity 0.4s; }
+.keeping .guide .log { visibility: hidden; } /* its opacity is the guide's to animate */
+/* A narrow screen: the way back, then the steps below it, only the present one named; the log's
+   newest note under them, over the dark top of the frame; the instrument at the upper right; what to
+   do, and the actions, across the bottom. The scene keeps the middle. */
+@media (max-width: 720px) {
+  .guide .back { top: 16px; left: 20px; }
+  .guide .sound { top: 11px; right: 16px; }
+  .guide .hero .hint { position: static; margin-top: 26px; }
+  .guide .steps { top: 48px; gap: 14px; font-size: 11px; white-space: nowrap; }
+  .guide .steps li:not(.now) .s { display: none; }
+  .guide .log { top: 88px; bottom: auto; left: 20px; right: 20px; width: auto; font-size: 12px; }
+  .guide .log li { grid-template-columns: 4rem 1fr; margin-top: 0; }
+  .guide .log li:nth-last-child(n + 2) { display: none; }
+  .guide.begun::before { background: linear-gradient(to top, rgb(20 16 12 / 0.66), rgb(20 16 12 / 0.34) 20vh, transparent 40vh), linear-gradient(to bottom, rgb(20 16 12 / 0.55), transparent 26vh); }
+  .guide .instrument { top: 88px; right: 20px; left: auto; bottom: auto; }
+  .rule-diagram, .rule-diagram svg { width: 128px; }
+  .rule-diagram svg { height: 128px; }
+  .rule-diagram figcaption .does { max-width: 128px; }
+  .guide .bottom { width: calc(100vw - 40px); bottom: 20px; gap: 14px; }
+  .guide .say { font-size: 14px; }
+  .guide .actions button { padding: 10px 14px; font-size: 11px; }
+}

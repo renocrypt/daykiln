@@ -1,0 +1,15 @@
+# Dependencies and build output: regenerated, never tracked.
+node_modules/
+dist/
+.vite/
+
+# Masters: full-resolution sources stay on the machine that fetched them.
+# Each room's research/ records where each came from and whether it may be committed.
+plates/assets-src/
+yaobian/assets-src/
+door/assets-src/
+
+# Local agent state, editor and OS cruft.
+.claude/
+.DS_Store
+*.log

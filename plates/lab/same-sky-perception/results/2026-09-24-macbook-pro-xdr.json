@@ -1,0 +1,112 @@
+{
+  "display": "MacBook Pro, Liquid Retina XDR",
+  "conditions": {
+    "trueTone": false,
+    "nightShift": false,
+    "browser": "Chrome 154",
+    "backend": "WebGPU"
+  },
+  "notes": [
+    "Green: a very slight change was perceived but rated 0 because it was so subtle; treat as at threshold.",
+    "Smaller window on the same display: the tester reduced the browser window and still saw the change for every wash rated 1 or more. This tests a smaller visual angle, not a phone's panel.",
+    "Lower display brightness: after the ratings, the tester lowered the display's brightness and found the change more obvious than at normal brightness. Observation only, not rated.",
+    "Directions of change were not recorded."
+  ],
+  "entries": [
+    {
+      "at": "2026-09-24T15:56:16.006Z",
+      "backend": "WebGPU",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "viewport": [
+        1118,
+        754
+      ],
+      "devicePixelRatio": 2,
+      "p3": true,
+      "hdr": true,
+      "sky": "twilight",
+      "intensity": 0.5,
+      "apertureFraction": 0.3,
+      "gradient": false,
+      "washA": "dark",
+      "washB": "neutral",
+      "perceivedShift": 3
+    },
+    {
+      "at": "2026-09-24T15:56:45.053Z",
+      "backend": "WebGPU",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "viewport": [
+        1118,
+        754
+      ],
+      "devicePixelRatio": 2,
+      "p3": true,
+      "hdr": true,
+      "sky": "twilight",
+      "intensity": 0.5,
+      "apertureFraction": 0.3,
+      "gradient": false,
+      "washA": "amber",
+      "washB": "neutral",
+      "perceivedShift": 1
+    },
+    {
+      "at": "2026-09-24T15:57:06.821Z",
+      "backend": "WebGPU",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "viewport": [
+        1118,
+        754
+      ],
+      "devicePixelRatio": 2,
+      "p3": true,
+      "hdr": true,
+      "sky": "twilight",
+      "intensity": 0.5,
+      "apertureFraction": 0.3,
+      "gradient": false,
+      "washA": "rose",
+      "washB": "neutral",
+      "perceivedShift": 1
+    },
+    {
+      "at": "2026-09-24T15:57:22.861Z",
+      "backend": "WebGPU",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "viewport": [
+        1118,
+        754
+      ],
+      "devicePixelRatio": 2,
+      "p3": true,
+      "hdr": true,
+      "sky": "twilight",
+      "intensity": 0.5,
+      "apertureFraction": 0.3,
+      "gradient": false,
+      "washA": "violet",
+      "washB": "neutral",
+      "perceivedShift": 3
+    },
+    {
+      "at": "2026-09-24T15:57:44.201Z",
+      "backend": "WebGPU",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "viewport": [
+        1118,
+        754
+      ],
+      "devicePixelRatio": 2,
+      "p3": true,
+      "hdr": true,
+      "sky": "twilight",
+      "intensity": 0.5,
+      "apertureFraction": 0.3,
+      "gradient": false,
+      "washA": "green",
+      "washB": "neutral",
+      "perceivedShift": 0
+    }
+  ]
+}
